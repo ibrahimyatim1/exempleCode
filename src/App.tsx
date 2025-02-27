@@ -5,6 +5,7 @@ import Weather from "./components/Weather";
 import styled, { createGlobalStyle } from "styled-components";
 import { v4 as uuidv4 } from "uuid";
 import { DataItem } from "./types";
+const api_url = import.meta.env.VITE_API_URL;
 
 const Container = createGlobalStyle`
   body {
@@ -19,18 +20,17 @@ const InnerContainer = styled.div`
 `;
 
 const App: React.FC = () => {
-  const [data, setData] = useState<DataItem | null>(null);
+  const [data, setData] = useState<DataItem[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "https://apitest.likewatt-infra.com/entry-test/2"
-        );
-        response.data.data.forEach((item: DataItem) => {
-          !item.id ? (item.id = uuidv4()) : item.id;
-        });
-        setData(response.data.data);
+        const response = await axios.get(`${api_url}/entry-test/2`);
+        const updatedData = response.data.data.map((item: DataItem) => ({
+          ...item,
+          id: item.id || uuidv4(),
+        }));
+        setData(updatedData);
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -44,7 +44,7 @@ const App: React.FC = () => {
       <Container />
       <InnerContainer>
         <Weather />
-        <Table dataProp={data} />
+        <Table dataProp={data} onUpdate={setData} />
       </InnerContainer>
     </>
   );

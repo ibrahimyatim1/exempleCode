@@ -12,8 +12,7 @@ const Title = styled.h1`
 const Container = styled.div`
   text-align: center;
 `;
-const api_key = "cd3e8f078b4a451575807f2664f28c33"; // generated from my personal account gmail account ibrahim.yatim.ul@gmail.com
-
+const api_key = import.meta.env.VITE_API_KEY;
 const Weather: FC = () => {
   const [weather, setWeather] = useState(null);
 
@@ -22,13 +21,10 @@ const Weather: FC = () => {
       try {
         navigator.geolocation.getCurrentPosition(async (position) => {
           const { latitude, longitude } = position.coords;
-          console.log("lattt:", latitude, "long:", longitude);
           const response = await fetch(
             `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${api_key}`
-            // `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&appid=${api_key}`
           );
           const res = await response.json();
-          console.log("res weather", res);
           setWeather(res.list.slice(0, 5));
         });
       } catch (error) {
